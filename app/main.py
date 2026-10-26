@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, redirect, render_template, url_for
 from app.models import db, Producto
+from app.forms import ProductoForm
 
 app = Flask(__name__)
 
@@ -26,14 +27,55 @@ with app.app_context():
 
 
 @app.route("/")
-def hello():
-    return "Hello, World!"
+def home():
+    return redirect(url_for("mostrar_catalogo"))
 
 
-@app.route("/test.db")
-def test_db():
+@app.route("/catalogo")
+def mostrar_catalogo():
     productos = Producto.query.all()
-    return f"Todos los productos: {productos}"
+    return render_template('catalogo.html', lista_productos = productos)
+
+@app.route("/producto_nuevo", methods=['GET', 'POST'])
+def crear_producto():
+    form = ProductoForm()
+    if form.validate_on_submit():
+        # Llega con POST 
+        nuevo_producto = Producto(
+            nombre = form.nombre.data,
+            precio = form.precio.data,
+            disponible = form.disponible.data,
+        )
+        db.session.add(nuevo_producto)
+        db.session.commit()
+        # Patrón PRG: redirigir después de procesar
+        return redirect(url_for('mostrar_catalogo'))
+    #Llega con GET
+    
+    return render_template("producto_form.html", form = form)
+
+@app.route("/producto/<int:prod_id>/editar", methods=['GET', 'POST'])
+def editar_producto(prod_id):
+    producto = db.get_or_404(Producto,prod_id)
+    
+    form = ProductoForm(obj = producto)
+    
+    if form.validate_on_submit():
+        producto.nombre = form.nombre.data,
+        producto.precio = form.precio.data,
+        producto.disponible = form.disponible.data
+        
+        db.session.commit()
+        return redirect(url_for('mostrar_catalogo'))
+    return render_template('producto_form.html', form = form, titulo = "Editar producto")
+
+
+@app.route("/producto/<int:prod_id>/eliminar", methods=['POST'])
+def eliminar_producto(prod_id):
+    producto = db.get_or_404(Producto, prod_id)
+    db.session.delete(producto)
+    db.session.commit()
+    return redirect(url_for('mostrar_catalogo'))          
 
 
 if __name__ == "__main__":
