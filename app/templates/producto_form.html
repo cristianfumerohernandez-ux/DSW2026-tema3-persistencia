@@ -31,9 +31,15 @@
     </div>
 
     <div style="margin-bottom: 15px;">
-        {{ form.imagen.label }}
-        {{ form.imagen() }}
-        {% for error in form.imagen.errors %}
+        {{ form.archivo_imagen.label }}
+        {% if producto and producto.imagen %}
+        <img src="{{ url_for('static', filename='img/uploads/' + producto.imagen)}}"width =100px alt="{{ producto.nombre }}">
+        {% else %}
+        <span>(No hay imagen)</span>
+        {% endif %}
+        <span>Sube un archivo si quieres subir una imagen</span>
+        {{ form.archivo_imagen() }}
+        {% for error in form.archivo_imagen.errors %}
             <span style="color: red;">{{ error }}</span>
         {% endfor %}
 
