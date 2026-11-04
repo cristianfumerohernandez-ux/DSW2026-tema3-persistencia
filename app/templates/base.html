@@ -1,24 +1,39 @@
 <!-- Archivo: app/templates/base.html -->
 <DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Mi Tienda Flask{% endblock %}</title>
-</head>
-<body style="font-family: Arial, sans-serif; margin: 20px;">
-    <nav>
-        <a href="{{ url_for('mostrar_catalogo') }}">Catálogo de Productos</a> |
-        <a href="{{ url_for('crear_producto') }}">➕ Nuevo Producto</a>
-    </nav>
-    <hr>
+    <html lang="es">
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Mi Tienda Flask{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename= '/css/base.css')}}">
+    </head>
 
-    <hr>
-    <footer>
-        <p>&copy; 2026 Curso de Flask - Acceso a Datos</p>
-    </footer>
-</body>
-</html>
+    <body style="font-family: Arial, sans-serif; margin: 20px;">
+        <nav>
+            <a href="{{ url_for('mostrar_catalogo') }}">Catálogo de Productos</a> |
+            <a href="{{ url_for('crear_producto') }}">➕ Nuevo Producto</a> |
+            <a href="{{ url_for('ver_carrito') }}">🛒 Ver carrito </a>
+        </nav>
+        <hr>
+        <!-- Bloque para mostrar mensajes volátiles flash() -->
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+        {% for categoria, mensaje in mensajes %}
+        <div class="message {{categoria}} " >
+            {{categoria | title}}: {{ mensaje }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <hr>
+        <footer>
+            <p>&copy; 2026 Curso de Flask - Acceso a Datos</p>
+        </footer>
+    </body>
+
+    </html>
